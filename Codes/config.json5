@@ -277,6 +277,22 @@
             "stringsInMessage": ["", ],
         },
         //
+        // ユーザー名のフィルタリング
+        "senderNameFiltering": {
+            // ユーザー名を渡さない
+            // ボットのメッセージを読ませるけどボット名は読ませないなどの用途
+            "userNamesToNameless": ["streamelements", ],
+        },
+        // メッセージのフィルタリング
+        "messageFiltering": {
+            // エモートの置換
+            // 頭のユーザー名の削除など
+            "emoteReplacementsRegex": {
+                "^handcoRocoro$" : "Corocoro",
+                "^handco" : "",
+            },
+        },
+        //
         // 受け渡すメッセージの構成
         //
         // 受け渡すメッセージの中で置換される文字列たち

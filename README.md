@@ -1,3 +1,30 @@
+チャットメッセージの棒読みちゃんへの受け渡し機能を少し拡張しました。
+
+`config.json5` の棒読みちゃん受け渡し設定に以下のように追加箇所があります。
+
+```
+        //
+        // ユーザー名のフィルタリング
+        "senderNameFiltering": {
+            // ユーザー名を渡さない
+            // 指定したボットのメッセージを読ませるけどボット名は読ませないなどの用途
+            "userNamesToNameless": ["streamelements", ],
+        },
+        // メッセージのフィルタリング
+        "messageFiltering": {
+            // エモートの置換（正規表現）
+            // 頭のユーザー名の削除などに使用
+            "emoteReplacementsRegex": {
+                "^handcoRocoro$" : "Corocoro",
+                "^handco" : "",
+            },
+        },
+```
+
+適宜変更してください。
+
+----
+
 最終更新日：2024-01-11 (v3.3.0)
 
 # Twitch EventSub Response Bot (twitch-eventsub-response-py)

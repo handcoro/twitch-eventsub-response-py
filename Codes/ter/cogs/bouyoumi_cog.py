@@ -7,6 +7,7 @@ import subprocess
 from typing import Any
 
 import aiohttp
+import regex
 from twitchio import Chatter, Message, PartialUser
 from twitchio.ext import commands
 
@@ -119,6 +120,22 @@ class TERBouyomiCog(TERBaseCog):
             ]
             if str(s).strip() != ""
         ]
+        ## エモートのフィルタリング
+        self.__emotes_filtering_regex: dict[str, str] = {
+            k: v
+            for k, v in self.__settings_replaced["messageFiltering"][
+                "emoteReplacementsRegex"
+                ].items()
+        }
+        ## ユーザー名のフィルタリング
+        #   ユーザー名を送らない
+        self.__sender_user_names_to_nameless: list[str] = [
+            str(s).casefold().strip()
+            for s in self.__settings_replaced["senderNameFiltering"][
+                "userNamesToNameless"
+            ]
+            if str(s).casefold().strip() != ""
+        ]
         #
         #
         # 翻訳先メッセージの構成
@@ -183,6 +200,10 @@ class TERBouyomiCog(TERBaseCog):
                 if word in emote_names:
                     if emote_order >= self.__num_emotes:
                         words[i] = ""
+                    # 効率悪そうなエモートの置換
+                    else:
+                        for pat, rep in self.__emotes_filtering_regex.items():
+                            words[i] = regex.sub(pat, rep, words[i])
                     emote_order += 1
             text = " ".join(words)
         #
@@ -228,6 +249,9 @@ class TERBouyomiCog(TERBaseCog):
                 return
         #
         #
+        # 送信者のユーザー名と表示名を送らない処理
+        if sender_user_name in self.__sender_user_names_to_nameless:
+            sender_user_name = sender_display_name = ""
         # 送信ユーザーのユーザー名ないし表示名に対する制限を適用
         if self.__ignores_sender_name_suffix_num is True:
             sender_user_name = sender_user_name.rstrip("0123456789０１２３４５６７８９")
