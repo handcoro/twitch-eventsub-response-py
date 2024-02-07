@@ -277,16 +277,13 @@
             "stringsInMessage": ["", ],
         },
         //
-        // ユーザー名のフィルタリング
-        "senderNameFiltering": {
+        // メッセージのフィルタリング
+        "messageFiltering": {
             // ユーザー名を渡さない
             // ボットのメッセージを読ませるけどボット名は読ませないなどの用途
             "userNamesToNameless": ["streamelements", ],
-        },
-        // メッセージのフィルタリング
-        "messageFiltering": {
-            // エモートの置換
-            // 頭のユーザー名の削除など
+            // エモートの置換（正規表現）
+            // 頭のユーザー名の削除などに使用
             "emoteReplacementsRegex": {
                 "^handcoRocoro$" : "Corocoro",
                 "^handco" : "",

@@ -131,7 +131,7 @@ class TERBouyomiCog(TERBaseCog):
         #   ユーザー名を送らない
         self.__sender_user_names_to_nameless: list[str] = [
             str(s).casefold().strip()
-            for s in self.__settings_replaced["senderNameFiltering"][
+            for s in self.__settings_replaced["messageFiltering"][
                 "userNamesToNameless"
             ]
             if str(s).casefold().strip() != ""

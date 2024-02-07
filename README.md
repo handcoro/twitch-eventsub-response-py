@@ -4,14 +4,11 @@
 
 ```
         //
-        // ユーザー名のフィルタリング
-        "senderNameFiltering": {
-            // ユーザー名を渡さない
-            // 指定したボットのメッセージを読ませるけどボット名は読ませないなどの用途
-            "userNamesToNameless": ["streamelements", ],
-        },
         // メッセージのフィルタリング
         "messageFiltering": {
+            // ユーザー名を渡さない
+            // ボットのメッセージを読ませるけどボット名は読ませないなどの用途
+            "userNamesToNameless": ["streamelements", ],
             // エモートの置換（正規表現）
             // 頭のユーザー名の削除などに使用
             "emoteReplacementsRegex": {
