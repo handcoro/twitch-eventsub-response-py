@@ -120,22 +120,21 @@ class TERBouyomiCog(TERBaseCog):
             ]
             if str(s).strip() != ""
         ]
-        ## エモートのフィルタリング
+        # メッセージのフィルタリング
+        #   エモートのフィルタリング
         self.__emotes_filtering_regex: dict[str, str] = {
             k: v
             for k, v in self.__settings_replaced["messageFiltering"][
                 "emoteReplacementsRegex"
                 ].items()
         }
-        ## ユーザー名のフィルタリング
-        #   ユーザー名を送らない
-        self.__sender_user_names_to_nameless: list[str] = [
-            str(s).casefold().strip()
-            for s in self.__settings_replaced["messageFiltering"][
-                "userNamesToNameless"
-            ]
-            if str(s).casefold().strip() != ""
-        ]
+        #  ユーザー名のフィルタリング
+        self.__sender_user_names_filtering: dict[str, str] = {
+            str(k).casefold().strip(): v
+            for k, v in self.__settings_replaced["messageFiltering"][
+                "userNamesReplacements"
+            ].items()
+        }
         #
         #
         # 翻訳先メッセージの構成
@@ -249,21 +248,22 @@ class TERBouyomiCog(TERBaseCog):
                 return
         #
         #
-        # 送信者のユーザー名と表示名を送らない処理
-        if sender_user_name in self.__sender_user_names_to_nameless:
-            sender_user_name = sender_display_name = ""
-        # 送信ユーザーのユーザー名ないし表示名に対する制限を適用
-        if self.__ignores_sender_name_suffix_num is True:
-            sender_user_name = sender_user_name.rstrip("0123456789０１２３４５６７８９")
-            sender_display_name = sender_display_name.rstrip(
-                "0123456789０１２３４５６７８９"
-            )
-        sender_user_name = sender_user_name[
-            : self.__num_sender_name_characters
-        ]
-        sender_display_name = sender_display_name[
-            : self.__num_sender_name_characters
-        ]
+        # 送信者の表示名を置換
+        if sender_user_name in self.__sender_user_names_filtering:
+            sender_display_name = self.__sender_user_names_filtering[sender_user_name]
+        else:
+            # 送信ユーザーのユーザー名ないし表示名に対する制限を適用
+            if self.__ignores_sender_name_suffix_num is True:
+                sender_user_name = sender_user_name.rstrip("0123456789０１２３４５６７８９")
+                sender_display_name = sender_display_name.rstrip(
+                    "0123456789０１２３４５６７８９"
+                )
+            sender_user_name = sender_user_name[
+                : self.__num_sender_name_characters
+            ]
+            sender_display_name = sender_display_name[
+                : self.__num_sender_name_characters
+            ]
         #
         #
         # 置換される文字列たちを定義

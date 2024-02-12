@@ -279,14 +279,16 @@
         //
         // メッセージのフィルタリング
         "messageFiltering": {
-            // ユーザー名を渡さない
-            // ボットのメッセージを読ませるけどボット名は読ませないなどの用途
-            "userNamesToNameless": ["streamelements", ],
-            // エモートの置換（正規表現）
+            // 送信ユーザー表示名変更（大文字小文字区別なし）
+            // 送信ユーザー名をもとに表示名を変える
+            "userNamesReplacements": {
+                "streamelements": "",
+            },
+            // エモートの置換（正規表現で大文字小文字区別あり）
             // 頭のユーザー名の削除などに使用
             "emoteReplacementsRegex": {
-                "^handcoRocoro$" : "Corocoro",
-                "^handco" : "",
+                "^handcoR(ocoro)$": "Cor\\1",
+                "^handco": "",
             },
         },
         //
