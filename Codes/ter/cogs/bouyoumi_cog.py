@@ -8,6 +8,7 @@ from typing import Any
 
 import aiohttp
 import regex
+import urllib.parse
 from twitchio import Chatter, Message, PartialUser
 from twitchio.ext import commands
 
@@ -279,8 +280,9 @@ class TERBouyomiCog(TERBaseCog):
         m: str = self.__messages_format
         for k, v in replacements.items():
             m = m.replace(k, v)
-        # 空白類を %20 に置換
-        m = "%20".join(m.split())
+        # URL エンコードして正しく文字列が渡るようにする
+        # 空白は %20 に置換される
+        m = urllib.parse.quote(m)
         #
         #
         try:
