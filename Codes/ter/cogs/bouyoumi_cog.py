@@ -142,6 +142,28 @@ class TERBouyomiCog(TERBaseCog):
         self.__messages_format: str = str(
             self.__settings_replaced["messagesFormat"]
         ).strip()
+        #
+        #
+        # Ban されたユーザーを記録
+        self.__banned_users: set[str] = set()
+
+    @commands.Cog.event()
+    async def event_raw_data(self, raw_data: str):
+        #
+        #
+        # TwitchのIRCメッセージを監視し、Banイベント (CLEARCHAT) を検出
+        # これで対応できるかは未確認
+        parts = raw_data.split()  # スペースで分割
+
+        # `CLEARCHAT` の位置を判定
+        clearchat_index = 2 if parts[0].startswith("@") else 1
+
+        # `CLEARCHAT` を検出した場合
+        if len(parts) > clearchat_index and parts[clearchat_index] == "CLEARCHAT":
+            if len(parts) > clearchat_index + 1 and parts[clearchat_index + 1].startswith(":"):  # Ban対象のユーザー名があるか確認
+                banned_user = parts[clearchat_index + 1].lstrip(":")  # ユーザー名を取得
+                self.__banned_users.add(banned_user.casefold())  # 小文字化して統一
+                print(f"User Banned (via CLEARCHAT): {banned_user}")
 
     @commands.Cog.event(event="event_message")  # type: ignore
     async def message_response(self, message: Message) -> None:
@@ -234,6 +256,10 @@ class TERBouyomiCog(TERBaseCog):
         #
         #
         # (受け渡さない 3/3)
+        #   ユーザーが Ban されている
+        if sender_user_name in self.__banned_users:
+            print(f"Ignored message from banned user: {sender_user_name}")
+            return
         #   メッセージ送信者が翻訳しないユーザー名たちの中に含まれている
         if sender_user_name in self.__sender_user_names_to_ignore:
             return
