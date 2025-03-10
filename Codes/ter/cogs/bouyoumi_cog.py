@@ -93,6 +93,10 @@ class TERBouyomiCog(TERBaseCog):
         self.__num_emotes: int = int(
             self.__settings_replaced["limitsWhenPassing"]["numEmotes"]
         )
+        #   Cheerメッセージ数の上限
+        self.__num_cheers: int = int(
+            self.__settings_replaced["limitsWhenPassing"]["numCheers"]
+        )
         #
         #
         # 受け渡さないメッセージたち
@@ -186,6 +190,19 @@ class TERBouyomiCog(TERBaseCog):
         )
         #   /me 公式コマンド実行時に付随してくるもの
         text = text.removeprefix("\x01ACTION").removesuffix("\x01")
+        # Cheer 回数制限
+        # Cheer の合計値を `bits` タグから取得
+        cheer_bits = int(message.tags.get("bits", 0))
+        if cheer_bits > 0:
+            cheer_count = len(regex.findall(r"\bCheer\d+\b", text))
+            # Cheer の回数制限を超えた場合、最初の Cheer だけ残し、それ以降を削除
+            if cheer_count > self.__num_cheers:
+                text = regex.sub(
+                    r"\bCheer\d+\b",
+                    lambda m, c=iter(range(1, cheer_count + 1)): 
+                        f"Cheer{cheer_bits}" if next(c) == 1 else "",
+                    text
+                ).strip()
         #   エモート文字列たち
         if (
             message.tags is not None
