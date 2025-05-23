@@ -1,25 +1,36 @@
 # Twitch EventSub Response Bot (twitch-eventsub-response-py) の個人的改造版
 チャットメッセージの棒読みちゃんへの受け渡し機能を自分用に少し拡張したやつです。
+他にも色々機能追加してみました
 
-`config.json5` の棒読みちゃん受け渡し設定に以下のように追加箇所があります。
+- ユーザー名置換機能
+- エモート読み上げ置換機能
+- Ban ユーザー読み上げ無視機能
+- チア読み上げ圧縮機能
+- 配信セッションごとの初コメントユーザーお知らせ機能（OBS 連携）
 
-```
-        //
-        // メッセージのフィルタリング
-        "messageFiltering": {
-            // 送信ユーザー表示名変更（大文字小文字区別なし）
-            // 送信ユーザー名をもとに表示名を変える
-            "userNamesReplacements": {
-                "streamelements": "",
-            },
-            // エモートの置換（正規表現で大文字小文字区別あり）
-            // 頭のユーザー名の削除などに使用
-            "emoteReplacementsRegex": {
-                "^handcoR(ocoro)$": "Cor\\1",
-                "^handco": "",
-            },
-        },
-```
+`config.json5` に以下のように追加箇所があります。
+
+棒読みちゃん関連
+| 箇所 | 変更する部分 | 説明 |
+| :-- | :--------- | :-- |
+| "userNamesReplacements" | "streamelements": "", | ユーザー名を別名で読み上げます。空白にするとユーザー名は省略されます。カンマのあとに同じように列挙できます |
+| "emoteReplacementsRegex" | "^handcoR(ocoro)$": "Cor\\1", | エモートを正規表現で置換できます |
+|                          |    "^handco": "", | 接頭のユーザー名を削除して読み上げたいときなどに |
+|"numCheers": 5, | 5 | 一度のチア読み上げ回数を設定した数を超えたらビッツをまとめて読み上げます |
+
+配信セッションの初コメントユーザーを検出したときに音を鳴らす機能部分
+
+| 箇所 | 変更する部分 | 説明 |
+| :-- | :--------- | :-- |
+| "soundNotifier": { ||||
+| "firstComment": { ||||
+| "enabled": false | false | true にすると機能が有効になります |
+| "obsSourceName": "first_comment_alert" | first_comment_alert | OBSのメディアソース名を指定します。有効にしたら音声が流れるように設定しておいてください |
+| "durationSec": 2.0 | 2.0 | メディアソースを有効にする秒数です |
+| "obs": { || OBS WebSocket 関連の設定です |
+| "host": "localhost", | localhost | 通常は変えなくてもいいはずです |
+| "port": 4455, | 4455      | OBS WebSocket のポートですが普通はこのままです |
+| "password": "passwd", | passwd | OBS の WebSocket サーバー設定画面から確認できます |
 
 適宜追加変更してください。
 

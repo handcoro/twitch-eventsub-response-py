@@ -303,4 +303,16 @@
         //  {{senderMessage}} -> 送信ユーザーのメッセージ
         "messagesFormat": "{{senderDisplayName}} san: {{senderMessage}}",
     },
+    "soundNotifier": {
+        "firstComment": {
+            "enabled": false,
+            "obsSourceName": "first_comment_alert",
+            "durationSec": 2.0,
+        },
+    },
+    "obs": {
+        "host": "localhost",
+        "port": 4455,
+        "password": "passwd",
+    },
 }
