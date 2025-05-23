@@ -74,15 +74,14 @@ class TERBot(commands.Bot):
                 self.__j["responses"]["/raid"],
             )
         )
-        self.add_cog(
-            TERBouyomiCog(
-                self.__token,
-                pu,
-                self.__j["bouyomiChan"],
-                [],
-                self.__prefix,
-            )
+        bouyomi_cog = TERBouyomiCog(
+            self.__token,
+            pu,
+            self.__j["bouyomiChan"],
+            [],
+            self.__prefix,
         )
+        self.add_cog(bouyomi_cog)
         self.add_cog(
             TERTransCog(
                 self.__token,
@@ -90,6 +89,23 @@ class TERBot(commands.Bot):
                 self.__j["translation"],
                 [],
                 self.__prefix,
+            )
+        )
+        obs_cog = TERObsCog(
+            self.__token,
+            pu,
+            self.__j["obs"],
+            [],
+        )
+        self.add_cog(obs_cog)
+        self.add_cog(
+            TERSoundNotifierCog(
+                self.__token,
+                pu,
+                self.__j["soundNotifier"],
+                [],
+                bouyomi_cog,
+                obs_cog,
             )
         )
         #
@@ -221,3 +237,8 @@ class TERBot(commands.Bot):
         c: commands.Cog | None = self.get_cog("TERBouyomiCog")
         if type(c) is TERBouyomiCog:
             c.kill_process()
+
+    def kill_obs_connection(self) -> None:
+        c: commands.Cog | None = self.get_cog("TERObsCog")
+        if type(c) is TERObsCog:
+            c.kill_connection()

@@ -84,6 +84,7 @@ def main(
         else:
             print(f"")
         _b.kill_bouyomi_process()
+        _b.kill_obs_connection()
         print(f"")
         print(f"-" * len(_title))
         #

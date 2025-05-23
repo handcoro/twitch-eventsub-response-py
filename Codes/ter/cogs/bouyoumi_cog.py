@@ -7,7 +7,7 @@ import subprocess
 from typing import Any
 
 import aiohttp
-import regex
+import re
 import urllib.parse
 from twitchio import Chatter, Message, PartialUser
 from twitchio.ext import commands
@@ -151,23 +151,38 @@ class TERBouyomiCog(TERBaseCog):
         # Ban されたユーザーを記録
         self.__banned_users: set[str] = set()
 
-    @commands.Cog.event()
+    @property
+    def banned_users(self):
+        return self.__banned_users
+    @property
+    def ignored_users(self):
+        if not hasattr(self, '_ignored_users_set'):
+            self._ignored_users_set = set(self.__sender_user_names_to_ignore)
+        return self._ignored_users_set
+
+    @commands.Cog.event() # type: ignore
     async def event_raw_data(self, raw_data: str):
         #
         #
         # TwitchのIRCメッセージを監視し、Banイベント (CLEARCHAT) を検出
         # これで対応できるかは未確認
-        parts = raw_data.split()  # スペースで分割
+        # 不正なデータを早期リターン
+        if not isinstance(raw_data, str) or not raw_data or len(raw_data.split()) < 3:
+            return
+        try:
+            parts = raw_data.split()  # スペースで分割
 
-        # `CLEARCHAT` の位置を判定
-        clearchat_index = 2 if parts[0].startswith("@") else 1
+            # `CLEARCHAT` の位置を判定
+            clearchat_index = 2 if parts[0].startswith("@") else 1
 
-        # `CLEARCHAT` を検出した場合
-        if len(parts) > clearchat_index and parts[clearchat_index] == "CLEARCHAT":
-            if len(parts) > clearchat_index + 1 and parts[clearchat_index + 1].startswith(":"):  # Ban対象のユーザー名があるか確認
-                banned_user = parts[clearchat_index + 1].lstrip(":")  # ユーザー名を取得
-                self.__banned_users.add(banned_user.casefold())  # 小文字化して統一
-                print(f"User Banned (via CLEARCHAT): {banned_user}")
+            # `CLEARCHAT` を検出した場合
+            if len(parts) > clearchat_index and parts[clearchat_index] == "CLEARCHAT":
+                if len(parts) > clearchat_index + 1 and parts[clearchat_index + 1].startswith(":"):  # Ban対象のユーザー名があるか確認
+                    banned_user = parts[clearchat_index + 1].lstrip(":")  # ユーザー名を取得
+                    self.__banned_users.add(banned_user.casefold())  # 小文字化して統一
+                    print(f"User Banned (via CLEARCHAT): {banned_user}")
+        except Exception as e:
+            print(f"event_raw_data: {e}")
 
     @commands.Cog.event(event="event_message")  # type: ignore
     async def message_response(self, message: Message) -> None:
@@ -194,12 +209,12 @@ class TERBouyomiCog(TERBaseCog):
         # Cheer の合計値を `bits` タグから取得
         cheer_bits = int(message.tags.get("bits", 0))
         if cheer_bits > 0:
-            cheer_count = len(regex.findall(r"\bCheer\d+\b", text))
+            cheer_count = len(re.findall(r"\bCheer\d+\b", text))
             # Cheer の回数制限を超えた場合、最初の Cheer だけ残し、それ以降を削除
             if cheer_count > self.__num_cheers:
-                text = regex.sub(
+                text = re.sub(
                     r"\bCheer\d+\b",
-                    lambda m, c=iter(range(1, cheer_count + 1)): 
+                    lambda m, c=iter(range(1, cheer_count + 1)):
                         f"Cheer{cheer_bits}" if next(c) == 1 else "",
                     text
                 ).strip()
@@ -242,7 +257,7 @@ class TERBouyomiCog(TERBaseCog):
                     # 効率悪そうなエモートの置換
                     else:
                         for pat, rep in self.__emotes_filtering_regex.items():
-                            words[i] = regex.sub(pat, rep, words[i])
+                            words[i] = re.sub(pat, rep, words[i])
                     emote_order += 1
             text = " ".join(words)
         #

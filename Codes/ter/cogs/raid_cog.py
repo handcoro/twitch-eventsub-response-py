@@ -25,7 +25,10 @@ class TERRaidCog(TERBaseCog):
         #
         print(f"  Responding to raid ...")
         raid_broadcaster_user_name: str = tags.get("msg-param-login", "")
+        raid_broadcaster_display_name: str = tags.get("display-name", "")
+        raid_broadcaster_channel_url: str = f"https://www.twitch.tv/{raid_broadcaster_user_name}"
         print(f"    Raid broadcaster user name = {raid_broadcaster_user_name}")
+        print(f"    {raid_broadcaster_display_name}さん{raid_broadcaster_channel_url}") #コピペ用
         #
         #
         # コマンドやメッセージたち
